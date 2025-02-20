@@ -1,0 +1,960 @@
+select  "serial_number" ,"nai",t1.mac as "mac","product_class","tags","status","provisioned_at","activated_at","subscription_code",
+"subscription_expiry","full_name", "mobile_number",
+"email","preferred_language","password","package code","Updated by" as "updated by","Updated at" as "updated at","iqd","maxmize_points"
+ from (
+--------------------------------------------------------------------
+((
+----normal case
+(select distinct 
+case when t3.itm_model_code='SWU-9200' and  t1.icc like '0416U9200%' then 'IQFA'|| trim('F' from t1.icc) 
+     when (t3.itm_model_code='SWU-9200' and  t1.icc like '416U9200%')or(t1.icc like '416U9200%') then 'IQFA0'|| trim('F' from t1.icc)
+     when t3.itm_model_code='BM632W' and  t1.icc like '416U9200%' then 'IQFA0'|| trim('F' from t1.icc)  
+     when (t3.itm_model_code='SWU-9200' and  t1.icc like '326U9200%')or (t1.icc like '326U9200%') then 'IQFA0'|| trim('F' from t1.icc)
+     when t3.itm_model_code='SWU-9200' and  t1.icc like '0ILF0915U9200%' then 'IQFA0'||substr(trim('F' from t1.icc),1,4)
+     when t3.itm_model_code='MODEL: SWU-9200' and  t1.icc like 'IQFA0416U9200%' then trim('F' from t1.icc) 
+     when t1.icc like '00DXHKC%' then substr(trim('F' from t1.icc),3)
+     when t1.icc like 'DXHKC%' then trim('F' from t1.icc)
+     when t1.icc like '00DVIKC%' then substr(trim('F' from t1.icc),3)
+     when t1.icc like 'DVIKC%' then trim('F' from t1.icc)
+     when t3.itm_model_code='SWU-9200' and  t1.icc ='0326U92000000270F' then 'IQFA'||substr(trim('F' from t1.icc),1,9)||'-'||substr(trim('F' from t1.icc),10,7)
+     when t3.itm_model_code='SWU-9200' and t1.icc ='0ILF0915U9200-0000002F' then 'IQFA'||substr(trim ('F' from t1.icc),5)
+     when t1.icc='8KA8WB1091700080F' then '8KA8WA1091700080'
+     when t1.icc='00DXNBC132801099F' then '00DXHKC132801099'
+     when t1.icc='1000000000000Y0PF' then '8KA8WA10C3000152'
+     when t1.icc='100000000000000QF' then '8KA8WA1151102033'
+     when t1.icc='100000000000000PF' then '8KA8WA1151101465'
+     when t1.icc='100000000000000QF' then '8KA8WA1151102033'
+     when t1.icc='1000000000000T0PF' then '8KA8WA1151101455'
+     when t1.icc='1000000000000O0PF' then '8KA8WA1151102047'
+     when t1.icc='1000000000000N0DF' then '8KA8WA1151101533'
+     when t1.icc='100000000000000EF' then '8KA8WA1151102806'
+     when t1.icc='100000000000000TF' then '8KA8WA1151101639'
+     when t1.icc='100000000000000UF' then '8KA8WA1151100310'
+     when t1.icc='100000000000000WF' then '8KA8WA1151100202'
+     when t1.icc='00DXNBC132801099F' then 'DXHKC132801099'
+     when t1.icc='100000000000000MF' then '8KA8WA1151101127'
+     when t1.icc='100000000000000HF' then '8KA8WA1151101261'
+     when t1.icc='100000000000000NF' then '8KA8WA1151102445'
+     when t1.icc='10000000000000TPF' then '8KA8WA1151101201'
+     when t1.icc='IQFA1342U920-00002551F' then 'IQFA1342U9200-00002551'
+     else trim('F' from t1.icc)
+end as "serial_number"
+, concat(t1.imsi,'@fanoostelecom.net') "nai",
+substr(t1.imsi,1,2)||':'||substr(t1.imsi,3,2)||':'||substr(t1.imsi,5,2)||':'||substr(t1.imsi,7,2)||':'||substr(t1.imsi,9,2)||':'||substr(t1.imsi,11,2) "MAC", 
+case when t1.icc like '%U9200-%'  or  t1.icc = '0326U92000000270F' or t1.icc = '0ILF0915U9200-0000002F' or t1.icc ='IQFA1342U920-00002551F' then  'SWU-9200' 
+     when t1.icc like '%C300C-%' then 'SWC-300C'  
+     when   t1.icc like '00DVIKC%' or t1.icc like 'DVIKC%' then 'DV-360'
+     when  t1.icc like '00DXHKC%' or t1.icc like 'DXHKC%' or t1.icc in ('00DXNBC132801099F', '00DXNBC132801099F')then 'DX-350'
+     when  t1.icc like '8KA8WA%' or 
+     t1.icc in ('8KA8WB1091700080F','1000000000000Y0PF','100000000000000QF','100000000000000PF','100000000000000QF','1000000000000T0PF',
+    '1000000000000O0PF','1000000000000N0DF','100000000000000EF','100000000000000TF','100000000000000UF','100000000000000WF', '100000000000000MF',
+    '100000000000000HF','100000000000000NF','10000000000000TPF' )   then  'BM632w'
+end "product_class",
+case
+-----------------------Chamchamal----------------------
+-------normal cpe chm---------
+
+    When T5.Pack_Code  In ('CHAM01','CHM01','CHM02','CHM03','CHM04','PRCHCP','CHEC01','CHEC02') And
+    T1.Imsi In ((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('CHM_CPE','PRCHSH_CPE_TST','SWC_CHM','CHM_CPE_GP')
+                )
+                Union
+                (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                 Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                 Where Inl_Item_Code In ('CHM_CPE','PRCHSH_CPE_TST','SWC_CHM','CHM_CPE_GP')
+                 )
+               )  Then '["commercial","chemchamal_shorsh","cpe"]'
+               
+ ----------maxwin cpe chm-----------         
+ When T5.Pack_Code  In ('SRECC') And
+    T1.Imsi In ((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('CHM_CPE','PRCHSH_CPE_TST','SWC_CHM','CHM_CPE_GP')
+                )
+                Union
+                (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                 Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                 Where Inl_Item_Code In ('CHM_CPE','PRCHSH_CPE_TST','SWC_CHM','CHM_CPE_GP')
+                 )
+               )  Then '["commercial","chemchamal_shorsh","cpe","maxwin"]'
+               
+-----------normal mifi-------               
+    WHEN t5.Pack_Code  IN ('CHMMI1','CHMMI2','PRCHMI','CHEMI2','CHEMI1') and
+    T1.Imsi In ((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('PRCHSH_MI_TST','CHM_MYFI')
+                )
+                Union
+                (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                 Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                 Where Inl_Item_Code In ('PRCHSH_MI_TST','CHM_MYFI')
+                 )
+               )  Then '["commercial","chemchamal_shorsh","mifi"]'
+
+-----------maxwin mifi ---------
+ WHEN t5.Pack_Code  IN ('SRECMI') and
+    T1.Imsi In ((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('PRCHSH_MI_TST','CHM_MYFI')
+                )
+                Union
+                (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                 Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                 Where Inl_Item_Code In ('PRCHSH_MI_TST','CHM_MYFI')
+                 )
+               )  Then '["commercial","chemchamal_shorsh","mifi","maxwin"]'
+                              
+------DUZ---------
+-------normal cpe--------
+    when t5.Pack_Code in ('DUZ02','DUZ03','ESDZC1','DUZ01','DUZ04','PRDUZ','PRDUZ1','ESDZC2') and
+    T1.Imsi In ((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('ESDZC1_DEV_TST','PRDUZ_TST','SWC_DUZ','DUZ_CPE','DUZ_CPE_GP')
+                )
+                Union
+                (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                 Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                 Where Inl_Item_Code In ('ESDZC1_DEV_TST','PRDUZ_TST','SWC_DUZ','DUZ_CPE','DUZ_CPE_GP')
+                 )
+               )  Then '["duz","commercial","cpe"]'
+               
+--------maxwin cpe ---------
+ when t5.Pack_Code in ('SRECC') and
+    T1.Imsi In ((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('ESDZC1_DEV_TST','PRDUZ_TST','SWC_DUZ','DUZ_CPE','DUZ_CPE_GP')
+                )
+                Union
+                (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                 Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                 Where Inl_Item_Code In ('ESDZC1_DEV_TST','PRDUZ_TST','SWC_DUZ','DUZ_CPE','DUZ_CPE_GP')
+                 )
+               )  Then '["duz","commercial","cpe","maxwin"]'
+               
+               
+-------normal mifi---------                
+    when t5.Pack_Code in ('DUZMI1','DUZMI2','PRDZMI','PDZMI1')  and
+    T1.Imsi In ((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('PRDZ_MI_TST','DUZ_MYFI')
+                )
+                Union
+                (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                 Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                 Where Inl_Item_Code In ('PRDZ_MI_TST','DUZ_MYFI')
+                 )
+               ) then '["duz","commercial","mifi"]'
+               
+-------maxwin mifi ------
+when t5.Pack_Code in ('SRECMI')  and
+    T1.Imsi In ((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('PRDZ_MI_TST','DUZ_MYFI')
+                )
+                Union
+                (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                 Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                 Where Inl_Item_Code In ('PRDZ_MI_TST','DUZ_MYFI')
+                 )
+               ) then '["duz","commercial","mifi","maxwin"]'       
+               
+----------Diyala-------
+-------normal cpe ---------
+    when t5.Pack_Code in ('DIY02','DIY04','DIY01','DIY03','DILEC1','DILEC2','PRDIL') and
+    T1.Imsi In ((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('PRMDIL','SWC_DIL','DYAL_CPE_GP','DYAL_CPE')
+                )
+                Union
+                (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                 Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                 Where Inl_Item_Code In ('PRMDIL','SWC_DIL','DYAL_CPE_GP','DYAL_CPE')
+                 )
+               )  then '["diyala","commercial","cpe"]'
+               
+------maxwin cpe---------
+ when t5.Pack_Code in ('SRECC') and
+    T1.Imsi In ((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('PRMDIL','SWC_DIL','DYAL_CPE_GP','DYAL_CPE')
+                )
+                Union
+                (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                 Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                 Where Inl_Item_Code In ('PRMDIL','SWC_DIL','DYAL_CPE_GP','DYAL_CPE')
+                 )
+               )  then '["diyala","commercial","cpe","maxwin"]'
+              
+---------normal mifi----------               
+        
+    When T5.Pack_Code In ('MIFIDY','MIFID2','PRDIMI','DLMEC1','DLMEC2')And
+         T1.Imsi In ((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('PRMDILMI','MYFI_DIY')
+                     )
+                    Union
+                    (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                    Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                    Where Inl_Item_Code In ('PRMDILMI','MYFI_DIY')
+                    )
+                  )  then '["diyala","commercial","mifi"]'
+                  
+------maxwin mifi-----------         
+ When T5.Pack_Code In ('SRECMI')And
+         T1.Imsi In ((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('PRMDILMI','MYFI_DIY')
+                     )
+                    Union
+                    (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                    Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                    Where Inl_Item_Code In ('PRMDILMI','MYFI_DIY')
+                    )
+                  )  then '["diyala","commercial","mifi","maxwin"]'
+                  
+----------normal cpe---------                  
+        
+    When T5.Pack_Code In ('DIFFB','DIFFPR','DIFFS') and
+    T1.Imsi In ((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('FNF_DIL','FNF_DIL_GP')
+                     )
+                    Union
+                    (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                    Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                    Where Inl_Item_Code In ('FNF_DIL','FNF_DIL_GP')
+                    )
+                  )  then '["fnf","diyala","cpe"]'
+                  
+---------maxwin cpe--------
+
+When T5.Pack_Code In ('SRECC') and
+    T1.Imsi In ((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('FNF_DIL','FNF_DIL_GP')
+                     )
+                    Union
+                    (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                    Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                    Where Inl_Item_Code In ('FNF_DIL','FNF_DIL_GP')
+                    )
+                  )  then '["fnf","diyala","cpe","maxwin"]'
+                  
+---------normal mifi-------                                    
+    When T5.Pack_Code In ('DIFFMI','DFFMIP') and
+     T1.Imsi In ((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('FNF_DIL_MIFI')
+                     )
+                    Union
+                    (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                    Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                    Where Inl_Item_Code In ('FNF_DIL_MIFI')
+                    )
+                  ) then '["fnf","diyala","mifi"]'
+                  
+------maxwin mifi---------
+When T5.Pack_Code In ('SRECMI') and
+     T1.Imsi In ((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('FNF_DIL_MIFI')
+                     )
+                    Union
+                    (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                    Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                    Where Inl_Item_Code In ('FNF_DIL_MIFI')
+                    )
+                  ) then '["fnf","diyala","mifi","maxwin"]'
+                  
+--------koya/dokan----------
+-------normal cpe--------
+
+    When T5.Pack_Code In ('KOYA01','DUKA01','DKECO2','KOYA03','DUKA04','DUKA03','KOYA04','DUKA02','PRDUK2','KOYA02','DKECO1')and
+    T1.Imsi In ((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('KOYA_CPE','KOYA_CPE-SWAP','KOYA_CPE_GP','PRKODK_CPE_TST','SWC_KOYA','DUKAN_CPE_GP','DUKAN_CPE')
+                     )
+                    Union
+                    (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                    Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                    Where Inl_Item_Code In ('KOYA_CPE','KOYA_CPE-SWAP','KOYA_CPE_GP','PRKODK_CPE_TST','SWC_KOYA','DUKAN_CPE_GP','DUKAN_CPE')
+                    )
+                  ) Then '["koya_dokan","commercial","cpe"]'
+                  
+---------maxwin cpe--------
+
+    When T5.Pack_Code In ('SRECC')and
+    T1.Imsi In ((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('KOYA_CPE','KOYA_CPE-SWAP','KOYA_CPE_GP','PRKODK_CPE_TST','SWC_KOYA','DUKAN_CPE_GP','DUKAN_CPE')
+                     )
+                    Union
+                    (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                    Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                    Where Inl_Item_Code In ('KOYA_CPE','KOYA_CPE-SWAP','KOYA_CPE_GP','PRKODK_CPE_TST','SWC_KOYA','DUKAN_CPE_GP','DUKAN_CPE')
+                    )
+                  ) Then '["koya_dokan","commercial","cpe","maxwin"]'
+---------normal mifi-------                  
+               
+    When T5.Pack_Code In ('DUKMI1','DKEMI2','DKEMI1','DUKMI2','PDUKMI') and
+    
+     T1.Imsi In ((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('PRKODK_MI_TST','DUK_MYFI')
+                     )
+                    Union
+                    (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                    Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                    Where Inl_Item_Code In ('PRKODK_MI_TST','DUK_MYFI')
+                    )
+                  ) Then '["koya_dokan","commercial","mifi"]'
+                  
+---------maxwin mifi--------
+When T5.Pack_Code In ('SRECMI') and
+    
+     T1.Imsi In ((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('PRKODK_MI_TST','DUK_MYFI')
+                     )
+                    Union
+                    (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                    Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                    Where Inl_Item_Code In ('PRKODK_MI_TST','DUK_MYFI')
+                    )
+                  ) Then '["koya_dokan","commercial","mifi","maxwin"]'
+
+                  
+------------TEST 
+ When T5.Pack_Code  In ('2DIL05')Then '["test","cpe"]'
+ When T5.Pack_Code  In ('2KO-MI') Then '["test","mifi"]'
+ 
+End "tags",
+
+
+case
+    when t4.status='ACTIVE'   then 'active'
+    when t4.status in ('FULLY BARRED','TEMP. HOLD','PERM. DISCONNECTED','PARTIALLY BARRED')   then 'blocked'
+else 'provisioned'
+end "status",
+To_Char(Trunc(T1.Creation_Date),'yyyy-mm-dd') "provisioned_at",
+case 
+when imsi ='002107244676' then '2013-11-08'
+when imsi ='00210724463E' then '2013-11-13'
+when imsi ='34CDBED12856' then '2013-12-25'
+else
+To_Char(Trunc(T7.Creation_Date),'yyyy-mm-dd') 
+end
+"activated_at",
+
+case when t5.Pack_Code in ('DUZ02','DIFFB','DUZ01','DIY02','DIY01','KOYA01','DUKA01','DUKA02','KOYA02','CHM02','CHM01','CHAM01') then 'basic'
+     when t5.Pack_Code in ('DUZ03','DIY04','DIY03','DUZ04','DIFFS','KOYA03','DUKA04','DUKA03','KOYA04','CHM03','CHM04') then 'super'
+     when t5.Pack_Code in ('PRDUK2','PRCHCP') then 'premium_unlimited'
+     when t5.Pack_Code in ('DIFFPR','PRDUZ1','PRDUZ','PRDIL') then 'premium_limited'
+     when t5.Pack_Code in ('ESDZC1','ESDZC2','DILEC1','DILEC2','DKECO2','DKECO1','CHEC02','CHEC01') then 'easy'
+     When T5.Pack_Code In ('DIFFMI','MIFIDY','DUZMI1','MIFID2','DUZMI2','DUKMI1','DUKMI2','CHMMI2','CHMMI1') Then 'mifi'
+     When T5.Pack_Code In ('DLMEC1','DLMEC2','DKEMI2','DKEMI1','CHEMI2','CHEMI1') Then 'mifi_easy'
+     when t5.Pack_Code in ('PDUKMI','PRCHMI','PDUKMI') then 'mifi_premium_unlimited'
+     when t5.Pack_Code in ('PRDIMI','PRDZMI','DFFMIP','PDZMI1') then 'mifi_premium_limited'
+     When T5.Pack_Code  ='SRECMI' Then 'maxwin_mifi'
+     When T5.Pack_Code  ='SRECC' Then 'maxwin_cpe'
+     When T5.Pack_Code In ('2DIL05') Then 'basic_test'
+     When T5.Pack_Code In ('2KO-MI') Then 'mifi_test'
+     
+end "subscription_code",
+to_char(trunc(t6.valid_stop),'yyyy-mm-dd') "subscription_expiry",
+t8.first_name ||' '|| t8.last_name  "full_name",
+
+  Case 
+  When T7.Mobile Like '+9647%' And Len(T7.Mobile)=17 Then '+964'||Substr(T7.Mobile,8)
+  When T7.Mobile Like '+9640%' And Len(T7.Mobile)=15 Then '+964'||Substr(T7.Mobile,6)
+  When T7.Mobile Like '9640%' And Len(T7.Mobile)=14 Then '+964'||Substr(T7.Mobile,5)
+  When T7.Mobile Like '964%' And Len(T7.Mobile)=13 Then '+964'||Substr(T7.Mobile,4)
+  When T7.Mobile Like '+9647%' And Len(T7.Mobile)=14 Then T7.Mobile
+  else '+9647480480480'
+  end
+ "mobile_number",
+case
+    when  t7.email like '%@%'and  t7.email like '%.%' then t7.email 
+else ''
+end "email",
+CASE 
+    WHEN t5.Pack_Code IN ('DIY01', 'DIY02','DIY03','DIY04','MIFID2','MIFIDY',
+        'PRDIMI','DIFFB','DIFFS','DIFFPR','DIFFB','DIFFS','DIFFPR','DIFFMI','DFFMIP','PRDIL'
+         ,'MFFB','MFFS','PRMC1','PRMM1','MOS01','MOS03','MOS04','MOS05','MOS11','MOSMI1',
+         'MOSMI2','MFFPR','MFFMIP','MFFMI','MOS02','MOSM1B','MFFPB','MOS01B','MOS04B','PRMC1B'
+         ,'PRMM1B','MFFB01','MFFMI1','MFFMP1','MFFPR1','MFFS01',
+         'DUZ01','DUZ02','DUZ03','DUZ04','DUZMI1','DUZMI2',
+         'ESDZC1','PRDZMI','PRDUZ','ESDZC2','PDZMI1','PRDUZ1','DILEC1','DILEC2','DLMEC1','DLMEC2')and
+         T1.Imsi In ((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('PRMDIL','SWC_DIL','DYAL_CPE_GP','DYAL_CPE','PRMDILMI','MYFI_DIY')
+                )
+                Union
+                (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                 Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                 Where Inl_Item_Code In ('PRMDIL','SWC_DIL','DYAL_CPE_GP','DYAL_CPE','PRMDILMI','MYFI_DIY')
+                 )
+               ) THEN 'Arabic'
+ELSE 'Kurdish'
+end "preferred_language",
+case when t3.itm_model_code='SWU-9200' and  t1.icc like '0416U9200%' then 'IQFA'|| trim('F' from t1.icc) 
+     when (t3.itm_model_code='SWU-9200' and  t1.icc like '416U9200%')or(t1.icc like '416U9200%') then 'IQFA0'|| trim('F' from t1.icc)
+     when t3.itm_model_code='BM632W' and  t1.icc like '416U9200%' then 'IQFA0'|| trim('F' from t1.icc)  
+     when (t3.itm_model_code='SWU-9200' and  t1.icc like '326U9200%')or (t1.icc like '326U9200%') then 'IQFA0'|| trim('F' from t1.icc)
+     when t3.itm_model_code='SWU-9200' and  t1.icc like '0ILF0915U9200%' then 'IQFA0'||substr(trim('F' from t1.icc),1,4)
+     when t3.itm_model_code='MODEL: SWU-9200' and  t1.icc like 'IQFA0416U9200%' then trim('F' from t1.icc) 
+     when t1.icc like '00DXHKC%' then substr(trim('F' from t1.icc),3)
+     when t1.icc like 'DXHKC%' then trim('F' from t1.icc)
+     when t1.icc like '00DVIKC%' then substr(trim('F' from t1.icc),3)
+     when t1.icc like 'DVIKC%' then trim('F' from t1.icc)
+     when t3.itm_model_code='SWU-9200' and  t1.icc ='0326U92000000270F' then 'IQFA'||substr(trim('F' from t1.icc),1,9)||'-'||substr(trim('F' from t1.icc),10,7)
+     when t3.itm_model_code='SWU-9200' and t1.icc ='0ILF0915U9200-0000002F' then 'IQFA'||substr(trim ('F' from t1.icc),5)
+     when t1.icc='8KA8WB1091700080F' then '8KA8WA1091700080'
+     when t1.icc='00DXNBC132801099F' then '00DXHKC132801099'
+     when t1.icc='1000000000000Y0PF' then '8KA8WA10C3000152'
+     when t1.icc='100000000000000QF' then '8KA8WA1151102033'
+     when t1.icc='100000000000000PF' then '8KA8WA1151101465'
+     when t1.icc='100000000000000QF' then '8KA8WA1151102033'
+     when t1.icc='1000000000000T0PF' then '8KA8WA1151101455'
+     when t1.icc='1000000000000O0PF' then '8KA8WA1151102047'
+     when t1.icc='1000000000000N0DF' then '8KA8WA1151101533'
+     when t1.icc='100000000000000EF' then '8KA8WA1151102806'
+     when t1.icc='100000000000000TF' then '8KA8WA1151101639'
+     when t1.icc='100000000000000UF' then '8KA8WA1151100310'
+     when t1.icc='100000000000000WF' then '8KA8WA1151100202'
+     when t1.icc='00DXNBC132801099F' then 'DXHKC132801099'
+     when t1.icc='100000000000000MF' then '8KA8WA1151101127'
+     when t1.icc='100000000000000HF' then '8KA8WA1151101261'
+     when t1.icc='100000000000000NF' then '8KA8WA1151102445'
+     when t1.icc='10000000000000TPF' then '8KA8WA1151101201'
+     when t1.icc='IQFA1342U920-00002551F' then 'IQFA1342U9200-00002551'
+Else Trim('F' From T1.Icc)
+end "password",
+
+Case When T5.Pack_Code ='2DIL05' Then 'MAXNET Test Basic'
+     When T5.Pack_Code ='2KO-MI' Then 'MAXNET Test Mifi'
+     When T5.Pack_Code ='PRDZMI' Then 'Maxnet Mifi Premium'
+     
+   ELSE initcap(t9.name) 
+   END "package_name",
+case 
+-----chmchmal----
+     when t5.Pack_Code in ('CHM02','CHM01','CHAM01') then 'chm_basic'
+     when t5.Pack_Code in ('CHM03','CHM04') then 'chm_super'
+     when t5.Pack_Code in ('CHEC02','CHEC01') then 'chm_easy'
+     when t5.Pack_Code in ('PRCHCP') then 'chm_premium' 
+     When T5.Pack_Code In ('CHEMI2','CHEMI1') Then 'chm_mifi_easy'   
+     When T5.Pack_Code In ('CHMMI2','CHMMI1') Then 'chm_mifi'
+     when t5.Pack_Code in ('PRCHMI') then 'chm_mifi_premium'
+--------koya and dukan
+when t5.Pack_Code in ('KOYA01','DUKA01','DUKA02','KOYA02') then 'koya_basic'
+     when t5.Pack_Code in ('KOYA03','DUKA04','DUKA03','KOYA04') then 'koya_super'
+     when t5.Pack_Code in ('PRDUK2') then 'koya_premium'
+     when t5.Pack_Code in ('DKECO2','DKECO1') then 'koya_easy'
+     When T5.Pack_Code In ('DUKMI1','DUKMI2') Then 'koya_mifi'
+     When T5.Pack_Code In ('DKEMI2','DKEMI1') Then 'koya_mifi_easy'
+     when t5.Pack_Code in ('PDUKMI','PDUKMI') then 'koya_mifi_premium'
+--------duz
+     when t5.Pack_Code in ('DUZ02','DUZ01') then 'duz_basic'
+     when t5.Pack_Code in ('DUZ03','DUZ04') then 'duz_super'
+     when t5.Pack_Code in ('ESDZC1','ESDZC2') then 'duz_easy'
+     when t5.Pack_Code in ('PRDUZ1','PRDUZ') then 'duz_premium'
+     When T5.Pack_Code In ('DUZMI1','DUZMI2') Then 'duz_mifi'
+     when t5.Pack_Code in ('PRDZMI','PDZMI1') then 'duz_mifi_premium'
+
+--------diala
+     when t5.Pack_Code in ('DIY02','DIY01') then 'dil_basic'
+     when t5.Pack_Code in ('DIY04','DIY03') then 'dil_super'
+     when t5.Pack_Code in ('DILEC1','DILEC2') then 'dil_easy'
+     when t5.Pack_Code in ('PRDIL') then 'dil_premium'
+     When T5.Pack_Code In ('MIFIDY','MIFID2') Then 'dil_mifi'
+     When T5.Pack_Code In ('PRDIMI') Then 'dil_mifi_premium'
+     when t5.Pack_Code in ('DLMEC2','DLMEC1') then 'dil_mifi_easy'
+     
+--------diala fnf
+
+     when t5.Pack_Code in ('DIFFB') then 'dil_fnf_basic'
+     when t5.Pack_Code in ('DIFFS') then 'dil_fnf_super'
+     when t5.Pack_Code in ('DIFFPR') then 'dil_fnf_premium'
+     When T5.Pack_Code In ('DIFFMI') Then 'dil_fnf_mifi'  
+     when t5.Pack_Code in ('DFFMIP') then 'dil_fnf_mifi_premium'
+     
+     
+     
+--------others 
+     When T5.Pack_Code  ='SRECMI' Then 'maxwin_mifi_pkg'
+     When T5.Pack_Code  ='SRECC' Then 'maxwin_cpe_pkg'
+     When T5.Pack_Code In ('2DIL05') Then 'basic_test_pkg'
+     When T5.Pack_Code In ('2KO-MI') Then 'mifi_test_pkg'
+end "package code",
+t1.last_updated_by "Updated by",to_char(trunc(t1.last_update_date),'yyyy-mm-dd') "Updated at"
+from vu_simcards t1
+full outer join VU_UE_SALES_SERIAL_LINES t2 on (trim ('F' from t1.icc)=t2.ssn_serial_no)
+full outer join VU_ic_items t3 on(t3.itm_item_code=t2.ssn_item_code) 
+join vu_subscriptions t4 on (t1.icc=t4.icc_number)
+join Vu_Subs_Packages t5 on (t4.subs_keyvalue=t5.subs_keyvalue)
+join vu_subs_reserv_wallet t6 on (t6.subs_keyvalue=t4.subs_keyvalue)
+full outer join vu_web_customers t7 on (t7.mac=t1.imsi)
+join vu_customers t8 on (t4.cust_keyvalue=t8.cust_keyvalue)
+Join Vu_Packages T9 On (T5.Pack_Code=T9.Code)
+--join ABS_VIEW_OWNER.Vu_Ic_Inventory_Lines t10 on (t10.Inl_Item_Code=t3.itm_item_code)
+where t5.keyvalue=(select max(dd.keyvalue)from Vu_Subs_Packages dd where dd.subs_keyvalue=t5.subs_keyvalue )
+and t6.keyvalue=(select max(gg.keyvalue)from vu_subs_reserv_wallet gg where gg.subs_keyvalue=t6.subs_keyvalue)
+And Imsi In (
+--all district without kalar
+
+(Select imsi
+From Vu_Ue_Sales_Serial_Lines T1
+join Vu_Simcards t2 on (trim('F' from t2.icc)=t1.Ssn_Serial_No)
+Where Ssn_Item_Code In 
+('KOYA_CPE',
+'CHM_CPE',
+'KOYA_CPE-SWAP',
+'KOYA_CPE_GP',
+'ESDZC1_DEV_TST',
+'PRDZ_MI_TST',
+'PRCHSH_MI_TST',
+'PRCHSH_CPE_TST',
+'PRKODK_MI_TST',
+'PRKODK_CPE_TST',
+'PRMDIL',
+'PRMDILMI',
+'PRDUZ_TST',
+'SWC_CHM',
+'SWC_KOYA',
+'SWC_DUZ',
+'SWC_DIL',
+'DUZ_CPE',
+'MYFI_DIY',
+'CHM_CPE_GP',
+'DUKAN_CPE_GP',
+'DUZ_CPE_GP',
+'DYAL_CPE_GP',
+'DYAL_CPE',
+'DUKAN_CPE',
+'DUZ_MYFI',
+'CHM_MYFI',
+'DUK_MYFI',
+'FNF_DIL_MIFI',
+'FNF_DIL',
+'FNF_DIL_GP')
+
+)
+Union
+(Select imsi
+From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+join Vu_Simcards t2 on (trim('F' from t2.icc)=t1.Inl_Serial_No)
+
+Where Inl_Item_Code In 
+('KOYA_CPE',
+'CHM_CPE',
+'KOYA_CPE-SWAP',
+'KOYA_CPE_GP',
+'ESDZC1_DEV_TST',
+'PRDZ_MI_TST',
+'PRCHSH_MI_TST',
+'PRCHSH_CPE_TST',
+'PRKODK_MI_TST',
+'PRKODK_CPE_TST',
+'PRMDIL',
+'PRMDILMI',
+'PRDUZ_TST',
+'SWC_CHM',
+'SWC_KOYA',
+'SWC_DUZ',
+'SWC_DIL',
+'DUZ_CPE',
+'MYFI_DIY',
+'CHM_CPE_GP',
+'DUKAN_CPE_GP',
+'DUZ_CPE_GP',
+'DYAL_CPE_GP',
+'DYAL_CPE',
+'DUKAN_CPE',
+'DUZ_MYFI',
+'CHM_MYFI',
+'DUK_MYFI',
+'FNF_DIL_MIFI',
+'FNF_DIL',
+'FNF_DIL_GP')
+
+)
+))
+---------provisioned
+Union 
+(Select Trim ('F' From Icc) "serial_number",Concat(T2.Imsi,'@fanoostelecom.net') "nai",
+Substr(T2.Imsi,1,2)||':'||Substr(T2.Imsi,3,2)||':'||Substr(T2.Imsi,5,2)||':'||Substr(T2.Imsi,7,2)||':'||Substr(T2.Imsi,9,2)||':'||Substr(T2.Imsi,11,2) "MAC" ,
+case when t2.icc like '%U9200-%'  or  t2.icc = '0326U92000000270F' or t2.icc = '0ILF0915U9200-0000002F' or t2.icc ='IQFA1342U920-00002551F' then  'SWU-9200' 
+     when t2.icc like '%C300C-%' then 'SWC-300C'  
+     when t2.icc like '00DVIKC%' or t2.icc like 'DVIKC%' then 'DV-360'
+     when t2.icc like '00DXHKC%' or t2.icc like 'DXHKC%' or t2.icc in ('00DXNBC132801099F', '00DXNBC132801099F')then 'DX-350'
+     when t2.icc like '8KA8WA%' or 
+     t2.icc in ('8KA8WB1091700080F','1000000000000Y0PF','100000000000000QF','100000000000000PF','100000000000000QF','1000000000000T0PF',
+    '1000000000000O0PF','1000000000000N0DF','100000000000000EF','100000000000000TF','100000000000000UF','100000000000000WF', '100000000000000MF',
+    '100000000000000HF','100000000000000NF','10000000000000TPF' )   Then  'BM632w'
+End "product_class"
+,
+
+
+Case
+--------chemchamal_shorsh 
+When (T2.Icc Like '%C300C-%' Or T2.Icc Like 'DVIK%' or T2.Icc Like '8KA8WA%' or T2.Icc Like 'DXHKC%') 
+And Trim('F' From Icc_Number) In (
+Select Inl_Serial_No From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code in ('CHM_CPE','PRCHSH_CPE_TST','SWC_CHM','CHM_CPE_GP'))  Then '["commercial","chemchamal_shorsh","cpe"]'
+
+When  T2.Icc Like '%U9200-%'  And Trim('F' From Icc_Number) In
+(Select Inl_Serial_No From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code In('PRCHSH_MI_TST','CHM_MYFI')) Then '["commercial","chemchamal_shorsh","mifi"]'
+-----------DUZ-----------------
+When (T2.Icc Like '%C300C-%' Or T2.Icc Like 'DVIK%' or T2.Icc Like '8KA8WA%'  or T2.Icc Like 'DXHKC%') 
+And Trim('F' From Icc_Number) In (
+Select Inl_Serial_No From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code in ('ESDZC1_DEV_TST','PRDUZ_TST','SWC_DUZ','DUZ_CPE','DUZ_CPE_GP'))  Then '["duz","commercial","cpe"]'
+
+When  T2.Icc Like '%U9200-%'  And Trim('F' From Icc_Number) In
+(Select Inl_Serial_No From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code In('PRDZ_MI_TST','DUZ_MYFI')) Then '["duz","commercial","mifi"]'
+----------Diyala-------
+When (T2.Icc Like '%C300C-%' Or T2.Icc Like 'DVIK%' or T2.Icc Like '8KA8WA%'  or T2.Icc Like 'DXHKC%') 
+And Trim('F' From Icc_Number) In (
+Select Inl_Serial_No From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code in ('PRMDIL','SWC_DIL','DYAL_CPE_GP','DYAL_CPE'))  Then '["diyala","commercial","cpe"]'
+
+When  T2.Icc Like '%U9200-%'  And Trim('F' From Icc_Number) In
+(Select Inl_Serial_No From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code In ('PRMDILMI','MYFI_DIY')) Then '["diyala","commercial","mifi"]'
+
+When (T2.Icc Like '%C300C-%' Or T2.Icc Like 'DVIK%' or T2.Icc Like '8KA8WA%'  or T2.Icc Like 'DXHKC%') 
+And Trim('F' From Icc_Number) In
+(Select Inl_Serial_No From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code In ('FNF_DIL','FNF_DIL_GP')) Then '["fnf","diyala","cpe"]'
+
+When  T2.Icc Like '%U9200-%'  And Trim('F' From Icc_Number) In
+(Select Inl_Serial_No From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code In ('FNF_DIL_MIFI')) Then '["fnf","diyala","mifi"]'
+
+--------koya/dokan----------
+When (T2.Icc Like '%C300C-%' Or T2.Icc Like 'DVIK%' or T2.Icc Like '8KA8WA%' or T2.Icc Like 'DXHKC%') 
+And Trim('F' From Icc_Number) In
+(Select Inl_Serial_No From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code In ('KOYA_CPE','KOYA_CPE-SWAP','KOYA_CPE_GP','PRKODK_CPE_TST','SWC_KOYA','DUKAN_CPE_GP','DUKAN_CPE')) Then '["koya_dokan","commercial","cpe"]'
+
+When  T2.Icc Like '%U9200-%'  And Trim('F' From Icc_Number) In
+(Select Inl_Serial_No From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code In ('PRKODK_MI_TST','DUK_MYFI')) Then '["koya_dokan","commercial","mifi"]'
+
+End "tags",
+
+Case 
+When T1.Cust_Keyvalue=1 Then 'provisioned'
+End "status",
+
+To_Char(Trunc(T2.Creation_Date),'yyyy-mm-dd') "provisioned_at",'' As "activated_at",null As "subscription_code" ,null As "subscription_expiry",null As "full_name",null As "mobile_number",
+null as "email",
+case 
+when t2.imsi in 
+((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('ESDZC1_DEV_TST','PRDUZ_TST','SWC_DUZ','DUZ_CPE','DUZ_CPE_GP','DUZMI1','DUZMI2','PRDZMI','PDZMI1'
+                             ,'DIY02','DIY04','DIY01','DIY03','DILEC1','DILEC2','PRDIL','MIFIDY','MIFID2','PRDIMI','DLMEC1','DLMEC2','DIFFB','DIFFPR','DIFFS','DIFFMI','DFFMIP')
+                )
+                Union
+                (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                 Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                 Where Inl_Item_Code In ('ESDZC1_DEV_TST','PRDUZ_TST','SWC_DUZ','DUZ_CPE','DUZ_CPE_GP','DUZMI1','DUZMI2','PRDZMI','PDZMI1',
+                 'DIY02','DIY04','DIY01','DIY03','DILEC1','DILEC2','PRDIL','MIFIDY','MIFID2','PRDIMI','DLMEC1','DLMEC2','DIFFB','DIFFPR','DIFFS','DIFFMI','DFFMIP')
+                 )
+               ) 
+
+then 'Arabic'
+else 'Kurdish'
+end "preferred_language"
+,Trim ('F' From Icc) "password",null as "package_name",null as "package code",t2.last_updated_by "updated by",to_char(trunc(t2.last_update_date),'yyyy-mm-dd') "updated at"
+From Vu_Subscriptions T1 
+join Vu_Simcards t2 on (T1.Icc_Number=t2.icc) 
+Where Cust_Keyvalue=1 And Trim('F' From Icc_Number) In (
+Select inl_serial_no From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code In 
+('KOYA_CPE',
+'CHM_CPE',
+'KOYA_CPE-SWAP',
+'KOYA_CPE_GP',
+'ESDZC1_DEV_TST',
+'PRDZ_MI_TST',
+'PRCHSH_MI_TST',
+'PRCHSH_CPE_TST',
+'PRKODK_MI_TST',
+'PRKODK_CPE_TST',
+'PRMDIL',
+'PRMDILMI',
+'PRDUZ_TST',
+'SWC_CHM',
+'SWC_KOYA',
+'SWC_DUZ',
+'SWC_DIL',
+'DUZ_CPE',
+'MYFI_DIY',
+'CHM_CPE_GP',
+'DUKAN_CPE_GP',
+'DUZ_CPE_GP',
+'DYAL_CPE_GP',
+'DYAL_CPE',
+'DUKAN_CPE',
+'DUZ_MYFI',
+'CHM_MYFI',
+'DUK_MYFI',
+'FNF_DIL_MIFI',
+'FNF_DIL',
+'FNF_DIL_GP')
+)
+
+)
+
+-----in the middle
+union
+
+( Select Trim ('F' From Icc) "serial_number",Concat(T2.Imsi,'@fanoostelecom.net') "nai",
+Substr(T2.Imsi,1,2)||':'||Substr(T2.Imsi,3,2)||':'||Substr(T2.Imsi,5,2)||':'||Substr(T2.Imsi,7,2)||':'||Substr(T2.Imsi,9,2)||':'||Substr(T2.Imsi,11,2) "MAC" ,
+case when t2.icc like '%U9200-%'  or  t2.icc = '0326U92000000270F' or t2.icc = '0ILF0915U9200-0000002F' or t2.icc ='IQFA1342U920-00002551F' then  'SWU-9200' 
+     when t2.icc like '%C300C-%' then 'SWC-300C'  
+     when t2.icc like '00DVIKC%' or t2.icc like 'DVIKC%' then 'DV-360'
+     when t2.icc like '00DXHKC%' or t2.icc like 'DXHKC%' or t2.icc in ('00DXNBC132801099F', '00DXNBC132801099F')then 'DX-350'
+     when t2.icc like '8KA8WA%' or 
+     t2.icc in ('8KA8WB1091700080F','1000000000000Y0PF','100000000000000QF','100000000000000PF','100000000000000QF','1000000000000T0PF',
+    '1000000000000O0PF','1000000000000N0DF','100000000000000EF','100000000000000TF','100000000000000UF','100000000000000WF', '100000000000000MF',
+    '100000000000000HF','100000000000000NF','10000000000000TPF' )   Then  'BM632w'
+End "product_class",
+
+Case
+--------chemchamal_shorsh 
+When (T2.Icc Like '%C300C-%' Or T2.Icc Like 'DVIK%' or T2.Icc Like '8KA8WA%') 
+And Trim('F' From Icc_Number) In (
+Select inl_serial_no From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code in
+('CHM_CPE','PRCHSH_CPE_TST','SWC_CHM','CHM_CPE_GP'))  Then '["commercial","chemchamal_shorsh","cpe"]'
+
+When  T2.Icc Like '%U9200-%'  And Trim('F' From Icc_Number) In
+(Select Inl_Serial_No From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code In('PRCHSH_MI_TST','CHM_MYFI')) Then '["commercial","chemchamal_shorsh","mifi"]'
+-----------DUZ-----------------
+When (T2.Icc Like '%C300C-%' Or T2.Icc Like 'DVIK%' or T2.Icc Like '8KA8WA%'  or T2.Icc Like 'DXHKC%') 
+And Trim('F' From Icc_Number) In (
+Select Inl_Serial_No From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code in ('ESDZC1_DEV_TST','PRDUZ_TST','SWC_DUZ','DUZ_CPE','DUZ_CPE_GP'))  Then '["duz","commercial","cpe"]'
+
+When  T2.Icc Like '%U9200-%'  And Trim('F' From Icc_Number) In
+(Select Inl_Serial_No From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code In('PRDZ_MI_TST','DUZ_MYFI')) Then '["duz","commercial","mifi"]'
+----------Diyala-------
+When (T2.Icc Like '%C300C-%' Or T2.Icc Like 'DVIK%' or T2.Icc Like '8KA8WA%'  or T2.Icc Like 'DXHKC%') 
+And Trim('F' From Icc_Number) In (
+Select Inl_Serial_No From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code in ('PRMDIL','SWC_DIL','DYAL_CPE_GP','DYAL_CPE'))  Then '["diyala","commercial","cpe"]'
+
+When  T2.Icc Like '%U9200-%'  And Trim('F' From Icc_Number) In
+(Select Inl_Serial_No From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code In ('PRMDILMI','MYFI_DIY')) Then '["diyala","commercial","mifi"]'
+
+When (T2.Icc Like '%C300C-%' Or T2.Icc Like 'DVIK%' or T2.Icc Like '8KA8WA%'  or T2.Icc Like 'DXHKC%') 
+And Trim('F' From Icc_Number) In
+(Select Inl_Serial_No From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code In ('FNF_DIL','FNF_DIL_GP')) Then '["fnf","diyala","cpe"]'
+
+When  T2.Icc Like '%U9200-%'  And Trim('F' From Icc_Number) In
+(Select Inl_Serial_No From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code In ('FNF_DIL_MIFI')) Then '["fnf","diyala","mifi"]'
+
+--------koya/dokan----------
+When (T2.Icc Like '%C300C-%' Or T2.Icc Like 'DVIK%' or T2.Icc Like '8KA8WA%' or T2.Icc Like 'DXHKC%') 
+And Trim('F' From Icc_Number) In
+(Select Inl_Serial_No From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code In ('KOYA_CPE','KOYA_CPE-SWAP','KOYA_CPE_GP','PRKODK_CPE_TST','SWC_KOYA','DUKAN_CPE_GP','DUKAN_CPE')) Then '["koya_dokan","commercial","cpe"]'
+
+When  T2.Icc Like '%U9200-%'  And Trim('F' From Icc_Number) In
+(Select Inl_Serial_No From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code In ('PRKODK_MI_TST','DUK_MYFI')) Then '["koya_dokan","commercial","mifi"]'
+
+End "tags",
+
+'provisioned' "status",
+To_Char(Trunc(T2.Creation_Date),'yyyy-mm-dd') "provisioned_at",'' As "activated_at",null As "subscription_code" ,null As "subscription_expiry",null As "full_name",null As "mobile_number",
+null as "email",
+
+case 
+when t2.imsi in 
+((Select Imsi From Vu_Ue_Sales_Serial_Lines T1
+                             Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Ssn_Serial_No)
+                             Where Ssn_Item_Code In ('ESDZC1_DEV_TST','PRDUZ_TST','SWC_DUZ','DUZ_CPE','DUZ_CPE_GP','DUZMI1','DUZMI2','PRDZMI','PDZMI1'
+                             ,'DIY02','DIY04','DIY01','DIY03','DILEC1','DILEC2','PRDIL','MIFIDY','MIFID2','PRDIMI','DLMEC1','DLMEC2','DIFFB','DIFFPR','DIFFS','DIFFMI','DFFMIP')
+                )
+                Union
+                (Select Imsi From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+                 Join Vu_Simcards T2 On (Trim('F' From T2.Icc)=T1.Inl_Serial_No)
+                 Where Inl_Item_Code In ('ESDZC1_DEV_TST','PRDUZ_TST','SWC_DUZ','DUZ_CPE','DUZ_CPE_GP','DUZMI1','DUZMI2','PRDZMI','PDZMI1',
+                 'DIY02','DIY04','DIY01','DIY03','DILEC1','DILEC2','PRDIL','MIFIDY','MIFID2','PRDIMI','DLMEC1','DLMEC2','DIFFB','DIFFPR','DIFFS','DIFFMI','DFFMIP')
+                 )
+               ) 
+
+then 'Arabic'
+else 'Kurdish'
+end "preferred_language"
+,Trim ('F' From Icc) "password",null as "package_name",null as "package code",
+t2.last_updated_by "updated by",to_char(trunc(t2.last_update_date),'yyyy-mm-dd') "updated at"
+From Vu_Subscriptions T1 Join Vu_Simcards T2 On (T1.Icc_Number=T2.Icc)
+where Trim('F' From Icc_Number) In (
+Select inl_serial_no From Abs_View_Owner.Vu_Ic_Inventory_Lines 
+Where Inl_Item_Code In (
+'KOYA_CPE',
+'CHM_CPE',
+'KOYA_CPE-SWAP',
+'KOYA_CPE_GP',
+'ESDZC1_DEV_TST',
+'PRDZ_MI_TST',
+'PRCHSH_MI_TST',
+'PRCHSH_CPE_TST',
+'PRKODK_MI_TST',
+'PRKODK_CPE_TST',
+'PRMDIL',
+'PRMDILMI',
+'PRDUZ_TST',
+'SWC_CHM',
+'SWC_KOYA',
+'SWC_DUZ',
+'SWC_DIL',
+'DUZ_CPE',
+'MYFI_DIY',
+'CHM_CPE_GP',
+'DUKAN_CPE_GP',
+'DUZ_CPE_GP',
+'DYAL_CPE_GP',
+'DYAL_CPE',
+'DUKAN_CPE',
+'DUZ_MYFI',
+'CHM_MYFI',
+'DUK_MYFI',
+'FNF_DIL_MIFI',
+'FNF_DIL',
+'FNF_DIL_GP'
+))
+And  Imsi In 
+('00210730004E','00210730005B','0021073022DC','0021073022E5','0021073023AE','0021073023B5','0021073023D3')
+)
+
+
+
+
+
+
+
+)
+))t1
+
+----walet
+------------------------------------------------------------------------------------
+full outer join ((
+select substr(imsi,1,2)||':'||substr(imsi,3,2)||':'||substr(imsi,5,2)||':'||substr(imsi,7,2)||':'||substr(imsi,9,2)||':'||substr(imsi,11,2) "MAC", 
+max (ff) as "iqd" ,null as"maxmize_points" from (
+with aa as 
+(select distinct  t1.cust_keyvalue,t1.subs_keyvalue,t2.imsi,t2.icc ,t3.wallet_amount ,t3.last_updated,t3.last_updated_date 
+from vu_subscriptions t1 
+join vu_simcards t2 on (t1.icc_number=t2.icc)
+join vu_cust_wallet t3 on  (t1.cust_keyvalue=t3.cust_keyvalue)
+order by t1.cust_keyvalue)  ,
+bb as (select distinct  t1.cust_keyvalue,t1.subs_keyvalue,t2.imsi,t2.icc ,t3.wallet_amount ,t3.last_updated,t3.last_updated_date
+from vu_subscriptions t1 
+join vu_simcards t2 on (t1.icc_number=t2.icc)
+join vu_cust_wallet t3 on  (t1.cust_keyvalue=t3.cust_keyvalue)
+order by t1.cust_keyvalue)
+select distinct  aa.cust_keyvalue,aa.subs_keyvalue,aa.imsi,aa.icc ,aa.wallet_amount,
+case when aa.cust_keyvalue <>1  then aa.wallet_amount/count(aa.cust_keyvalue)
+else 0
+end ff,
+aa.last_updated,aa.last_updated_date
+from aa join bb on(aa.cust_keyvalue=bb.cust_keyvalue)
+group by aa.cust_keyvalue,aa.subs_keyvalue,aa.imsi,aa.icc ,aa.wallet_amount,aa.last_updated,aa.last_updated_date
+order by aa.cust_keyvalue)
+where imsi In (
+--kalar
+
+(Select imsi
+From Vu_Ue_Sales_Serial_Lines T1
+join Vu_Simcards t2 on (trim('F' from t2.icc)=t1.Ssn_Serial_No)
+where Ssn_Item_Code in ('KOYA_CPE',
+'CHM_CPE',
+'KOYA_CPE-SWAP',
+'KOYA_CPE_GP',
+'ESDZC1_DEV_TST',
+'PRDZ_MI_TST',
+'PRCHSH_MI_TST',
+'PRCHSH_CPE_TST',
+'PRKODK_MI_TST',
+'PRKODK_CPE_TST',
+'PRMDIL',
+'PRMDILMI',
+'PRDUZ_TST',
+'SWC_CHM',
+'SWC_KOYA',
+'SWC_DUZ',
+'SWC_DIL',
+'DUZ_CPE',
+'MYFI_DIY',
+'CHM_CPE_GP',
+'DUKAN_CPE_GP',
+'DUZ_CPE_GP',
+'DYAL_CPE_GP',
+'DYAL_CPE',
+'DUKAN_CPE',
+'DUZ_MYFI',
+'CHM_MYFI',
+'DUK_MYFI',
+'FNF_DIL_MIFI',
+'FNF_DIL',
+'FNF_DIL_GP')
+)
+Union
+(Select imsi
+From Abs_View_Owner.Vu_Ic_Inventory_Lines T1
+join Vu_Simcards t2 on (trim('F' from t2.icc)=t1.Inl_Serial_No)
+
+where inl_item_code in ('KOYA_CPE',
+'CHM_CPE',
+'KOYA_CPE-SWAP',
+'KOYA_CPE_GP',
+'ESDZC1_DEV_TST',
+'PRDZ_MI_TST',
+'PRCHSH_MI_TST',
+'PRCHSH_CPE_TST',
+'PRKODK_MI_TST',
+'PRKODK_CPE_TST',
+'PRMDIL',
+'PRMDILMI',
+'PRDUZ_TST',
+'SWC_CHM',
+'SWC_KOYA',
+'SWC_DUZ',
+'SWC_DIL',
+'DUZ_CPE',
+'MYFI_DIY',
+'CHM_CPE_GP',
+'DUKAN_CPE_GP',
+'DUZ_CPE_GP',
+'DYAL_CPE_GP',
+'DYAL_CPE',
+'DUKAN_CPE',
+'DUZ_MYFI',
+'CHM_MYFI',
+'DUK_MYFI',
+'FNF_DIL_MIFI',
+'FNF_DIL',
+'FNF_DIL_GP')
+))
+Group By 
+ Substr(Imsi,1,2)||':'||Substr(Imsi,3,2)||':'||Substr(Imsi,5,2)||':'||Substr(Imsi,7,2)||':'||Substr(Imsi,9,2)||':'||Substr(Imsi,11,2)
+)
+)t2
+On (T1.Mac=T2.Mac)
+Where "nai" Is Not Null
+
+

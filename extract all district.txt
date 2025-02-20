@@ -1,0 +1,77 @@
+Select T4.Subs_Keyvalue  ,Imsi , Icc,t8.Ssn_Item_Code ,t8.ssn_serial_no,T4.Pack_code
+From Vu_Subscriptions T2  
+Join Vu_Simcards T3 On (T2.Icc_Number=T3.Icc) 
+Join Vu_Subs_Packages T4 On (T2.Subs_Keyvalue=T4.Subs_Keyvalue)
+Join((Select Ssn_Item_Code ,Ssn_Serial_No From Vu_Ue_Sales_Serial_Lines Where Ssn_Item_Code In (
+'KOYA_CPE',
+'CHM_CPE',
+'KOYA_CPE-SWAP',
+'KOYA_CPE_GP',
+'ESDZC1_DEV_TST',
+'PRDZ_MI_TST',
+'PRCHSH_MI_TST',
+'PRCHSH_CPE_TST',
+'PRKODK_MI_TST',
+'PRKODK_CPE_TST',
+'PRMDIL',
+'PRMDILMI',
+'PRDUZ_TST',
+'SWC_CHM',
+'SWC_KOYA',
+'SWC_DUZ',
+'SWC_DIL',
+'DUZ_CPE',
+'MYFI_DIY',
+'CHM_CPE_GP',
+'DUKAN_CPE_GP',
+'DUZ_CPE_GP',
+'DYAL_CPE_GP',
+'DYAL_CPE',
+'DUKAN_CPE',
+'DUZ_MYFI',
+'CHM_MYFI',
+'DUK_MYFI',
+'FNF_DIL_MIFI',
+'FNF_DIL',
+'FNF_DIL_GP')
+)
+Union
+(Select Inl_Item_Code , Inl_Serial_No From Abs_View_Owner.Vu_Ic_Inventory_Lines Where Inl_Item_Code In (
+'KOYA_CPE',
+'CHM_CPE',
+'KOYA_CPE-SWAP',
+'KOYA_CPE_GP',
+'ESDZC1_DEV_TST',
+'PRDZ_MI_TST',
+'PRCHSH_MI_TST',
+'PRCHSH_CPE_TST',
+'PRKODK_MI_TST',
+'PRKODK_CPE_TST',
+'PRMDIL',
+'PRMDILMI',
+'PRDUZ_TST',
+'SWC_CHM',
+'SWC_KOYA',
+'SWC_DUZ',
+'SWC_DIL',
+'DUZ_CPE',
+'MYFI_DIY',
+'CHM_CPE_GP',
+'DUKAN_CPE_GP',
+'DUZ_CPE_GP',
+'DYAL_CPE_GP',
+'DYAL_CPE',
+'DUKAN_CPE',
+'DUZ_MYFI',
+'CHM_MYFI',
+'DUK_MYFI',
+'FNF_DIL_MIFI',
+'FNF_DIL',
+'FNF_DIL_GP')
+))T8 On(T8.Ssn_Serial_No=Trim('F' From T3.Icc)) 
+Where 
+
+T4.Keyvalue=(Select Max(Dd.Keyvalue)From Vu_Subs_Packages Dd Where Dd.Subs_Keyvalue=T4.Subs_Keyvalue)
+
+
+
